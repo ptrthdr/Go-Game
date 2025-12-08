@@ -3,6 +3,13 @@ package pl.edu.go.model;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Wzorzec: Composite (KOMPOZYT)
+ * ---------------------------------
+ * StoneGroup reprezentuje grupę kamieni połączonych liniowo.
+ * Grupa zachowuje się jak jeden obiekt (ma wspólne oddechy).
+ * Umożliwia liczenie oddechów i wykrywanie bicia grupy.
+ */
 public class StoneGroup {
     private final int color;
     private final Set<Stone> stones = new HashSet<>();
@@ -21,14 +28,6 @@ public class StoneGroup {
 
     public Set<Stone> getStones() {
         return stones;
-    }
-
-    public Set<String> getPositions() {
-        Set<String> result = new HashSet<>();
-        for (Stone s : stones) {
-            result.add(s.getX() + "," + s.getY());
-        }
-        return result;
     }
 
     @Override

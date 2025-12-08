@@ -8,15 +8,20 @@ public class Move {
     public Move(int color, int x, int y) {
         this.color = color;
         this.x = x;
+
         this.y = y;
+
     }
 
-    public int getColor() { return color; }
-    public int getX() { return x; }
-    public int getY() { return y; }
+    public int getColor() {
+        return color;
+    }
 
-    @Override
-    public String toString() {
-        return "Move(color=" + color + ", x=" + x + ", y=" + y + ")";
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
     }
 }

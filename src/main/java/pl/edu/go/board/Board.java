@@ -5,6 +5,34 @@ import pl.edu.go.model.StoneGroup;
 
 import java.util.*;
 
+/**
+ * Klasa Board — logika gry Go dla Iteracji 1 (zasady 1–3).
+ *
+ * Wzorce projektowe:
+ *
+ * 1. Composite (Stone + StoneGroup)
+ * - Kamień jest elementem, StoneGroup jest kompozytem.
+ * - Board korzysta z kompozytu do wyszukiwania grup, liczenia oddechów
+ * i usuwania całych łańcuchów jednym wywołaniem.
+ *
+ * 2. Adapter (MoveAdapter — używany poza Board)
+ * - Board operuje na współrzędnych (x, y).
+ * - Adapter tłumaczy notację użytkownika (np. „D4”) na współrzędne tablicy.
+ * - Dzięki temu Board pozostaje czystym silnikiem gry.
+ *
+ * 3. Factory Method (BoardFactory — używany poza Board)
+ * - Oddziela tworzenie planszy od jej używania.
+ * - Ułatwia testowanie i ewentualne późniejsze rozszerzenia.
+ *
+ * Klasa implementuje logikę:
+ * - stawiania kamieni,
+ * - grup i oddechów,
+ * - bicia kamieni przeciwnika,
+ * - zakazu samobójstwa.
+ *
+ * Nie zajmuje się UI ani komunikacją — to zadanie Osoby B.
+ */
+
 public class Board {
 
     public static final int EMPTY = 0;
@@ -28,7 +56,8 @@ public class Board {
         int[][] dirs = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
 
         for (int[] d : dirs) {
-            int nx = x + d[0], ny = y + d[1];
+            int nx = x + d[0];
+            int ny = y + d[1];
             if (inside(nx, ny))
                 n.add(new int[] { nx, ny });
         }
@@ -121,7 +150,7 @@ public class Board {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        String[] symbols = { ".", "○", "●" };
+        String[] symbols = { ".", "●", "○" };
 
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {

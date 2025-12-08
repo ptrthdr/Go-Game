@@ -1,5 +1,12 @@
 package pl.edu.go.model;
 
+/**
+ * Wzorzec: Composite (LIŚĆ)
+ * --------------------------------
+ * Stone reprezentuje pojedynczy kamień na planszy Go.
+ * Jest najmniejszym elementem struktury Composite.
+ * Kamienie są później łączone w grupy (StoneGroup).
+ */
 public class Stone {
     private final int x;
     private final int y;
