@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
-Test set: pl.edu.go.BoardTests
+Test set: pl.edu.go.BoardLogicTest
 -------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.019 s -- in pl.edu.go.BoardTests
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.028 s -- in pl.edu.go.BoardLogicTest
