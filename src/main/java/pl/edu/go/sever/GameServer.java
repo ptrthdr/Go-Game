@@ -1,6 +1,24 @@
 package pl.edu.go.server;
 
+/**
+ * Klasa GameServer — punkt startowy serwera gry.
+ *
+ * Rola klasy:
+ * - tworzy obiekt Board i Game dla nowej partii,
+ * - tworzy GameSession, która zarządza logiką jednej gry,
+ * - otwiera gniazdo serwera (ServerSocket) na porcie 5000,
+ * - akceptuje dwóch klientów:
+ *   * pierwszy zostaje BLACK,
+ *   * drugi zostaje WHITE,
+ * - uruchamia osobne wątki ClientHandler dla każdego klienta,
+ * - po podłączeniu dwóch graczy wywołuje session.startGame().
+ *
+ * Klasa zawiera metodę main(...) i służy do uruchamiania serwera z terminala.
+ */
+
 import pl.edu.go.board.Board;
+import pl.edu.go.board.BoardFactory;
+
 import pl.edu.go.game.Game;
 import pl.edu.go.game.PlayerColor;
 
@@ -14,7 +32,7 @@ public class GameServer {
         int port = 5000;
         int boardSize = 9; // mniejsza plansza na testy
 
-        Board board = new Board(boardSize);
+        Board board = BoardFactory.createBoard(boardSize);
         Game game = new Game(board);
         GameSession session = new GameSession(game);
 

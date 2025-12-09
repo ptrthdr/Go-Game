@@ -1,67 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="pl.edu.go.BoardLogicTest" time="0.03" tests="8" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="pl.edu.go.BoardLogicTest" time="0.202" tests="13" errors="0" skipped="0" failures="0">
   <properties>
-    <property name="java.specification.version" value="25"/>
+    <property name="java.specification.version" value="17"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
-    <property name="java.class.path" value="/Users/theodor/Desktop/go/go-logic/target/test-classes:/Users/theodor/Desktop/go/go-logic/target/classes:/Users/theodor/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.2/junit-jupiter-5.10.2.jar:/Users/theodor/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.2/junit-jupiter-api-5.10.2.jar:/Users/theodor/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/Users/theodor/.m2/repository/org/junit/platform/junit-platform-commons/1.10.2/junit-platform-commons-1.10.2.jar:/Users/theodor/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/Users/theodor/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.2/junit-jupiter-params-5.10.2.jar:/Users/theodor/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.2/junit-jupiter-engine-5.10.2.jar:/Users/theodor/.m2/repository/org/junit/platform/junit-platform-engine/1.10.2/junit-platform-engine-1.10.2.jar:"/>
-    <property name="java.vm.vendor" value="Homebrew"/>
+    <property name="java.class.path" value="/mnt/c/studia/3sem/informatyka/lab4/Go-Game/target/test-classes:/mnt/c/studia/3sem/informatyka/lab4/Go-Game/target/classes:/home/shudo/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.2/junit-jupiter-5.10.2.jar:/home/shudo/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.2/junit-jupiter-api-5.10.2.jar:/home/shudo/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/shudo/.m2/repository/org/junit/platform/junit-platform-commons/1.10.2/junit-platform-commons-1.10.2.jar:/home/shudo/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/shudo/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.2/junit-jupiter-params-5.10.2.jar:/home/shudo/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.2/junit-jupiter-engine-5.10.2.jar:/home/shudo/.m2/repository/org/junit/platform/junit-platform-engine/1.10.2/junit-platform-engine-1.10.2.jar:"/>
+    <property name="java.vm.vendor" value="Ubuntu"/>
     <property name="sun.arch.data.model" value="64"/>
-    <property name="java.vendor.url" value="https://github.com/Homebrew/homebrew-core/issues"/>
-    <property name="os.name" value="Mac OS X"/>
-    <property name="java.vm.specification.version" value="25"/>
+    <property name="java.vendor.url" value="https://ubuntu.com/"/>
+    <property name="os.name" value="Linux"/>
+    <property name="java.vm.specification.version" value="17"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
-    <property name="user.country" value="PL"/>
-    <property name="sun.boot.library.path" value="/opt/homebrew/Cellar/openjdk/25/libexec/openjdk.jdk/Contents/Home/lib"/>
-    <property name="sun.java.command" value="/Users/theodor/Desktop/go/go-logic/target/surefire/surefirebooter-20251208193525371_3.jar /Users/theodor/Desktop/go/go-logic/target/surefire 2025-12-08T19-35-25_340-jvmRun1 surefire-20251208193525371_1tmp surefire_0-20251208193525371_2tmp"/>
+    <property name="sun.boot.library.path" value="/usr/lib/jvm/java-17-openjdk-amd64/lib"/>
+    <property name="sun.java.command" value="/mnt/c/studia/3sem/informatyka/lab4/Go-Game/target/surefire/surefirebooter-20251209124944318_3.jar /mnt/c/studia/3sem/informatyka/lab4/Go-Game/target/surefire 2025-12-09T12-49-43_321-jvmRun1 surefire-20251209124944318_1tmp surefire_0-20251209124944318_2tmp"/>
     <property name="jdk.debug" value="release"/>
-    <property name="surefire.test.class.path" value="/Users/theodor/Desktop/go/go-logic/target/test-classes:/Users/theodor/Desktop/go/go-logic/target/classes:/Users/theodor/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.2/junit-jupiter-5.10.2.jar:/Users/theodor/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.2/junit-jupiter-api-5.10.2.jar:/Users/theodor/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/Users/theodor/.m2/repository/org/junit/platform/junit-platform-commons/1.10.2/junit-platform-commons-1.10.2.jar:/Users/theodor/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/Users/theodor/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.2/junit-jupiter-params-5.10.2.jar:/Users/theodor/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.2/junit-jupiter-engine-5.10.2.jar:/Users/theodor/.m2/repository/org/junit/platform/junit-platform-engine/1.10.2/junit-platform-engine-1.10.2.jar:"/>
+    <property name="surefire.test.class.path" value="/mnt/c/studia/3sem/informatyka/lab4/Go-Game/target/test-classes:/mnt/c/studia/3sem/informatyka/lab4/Go-Game/target/classes:/home/shudo/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.2/junit-jupiter-5.10.2.jar:/home/shudo/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.2/junit-jupiter-api-5.10.2.jar:/home/shudo/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/shudo/.m2/repository/org/junit/platform/junit-platform-commons/1.10.2/junit-platform-commons-1.10.2.jar:/home/shudo/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/shudo/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.2/junit-jupiter-params-5.10.2.jar:/home/shudo/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.2/junit-jupiter-engine-5.10.2.jar:/home/shudo/.m2/repository/org/junit/platform/junit-platform-engine/1.10.2/junit-platform-engine-1.10.2.jar:"/>
     <property name="sun.cpu.endian" value="little"/>
-    <property name="user.home" value="/Users/theodor"/>
-    <property name="user.language" value="pl"/>
+    <property name="user.home" value="/home/shudo"/>
+    <property name="user.language" value="en"/>
     <property name="java.specification.vendor" value="Oracle Corporation"/>
-    <property name="java.version.date" value="2025-09-16"/>
-    <property name="java.home" value="/opt/homebrew/Cellar/openjdk/25/libexec/openjdk.jdk/Contents/Home"/>
+    <property name="java.version.date" value="2025-07-15"/>
+    <property name="java.home" value="/usr/lib/jvm/java-17-openjdk-amd64"/>
     <property name="file.separator" value="/"/>
-    <property name="basedir" value="/Users/theodor/Desktop/go/go-logic"/>
-    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="basedir" value="/mnt/c/studia/3sem/informatyka/lab4/Go-Game"/>
+    <property name="java.vm.compressedOopsMode" value="32-bit"/>
     <property name="line.separator" value="&#10;"/>
-    <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
-    <property name="apple.awt.application.name" value="ForkedBooter"/>
-    <property name="surefire.real.class.path" value="/Users/theodor/Desktop/go/go-logic/target/surefire/surefirebooter-20251208193525371_3.jar"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="surefire.real.class.path" value="/mnt/c/studia/3sem/informatyka/lab4/Go-Game/target/surefire/surefirebooter-20251209124944318_3.jar"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
-    <property name="java.runtime.version" value="25"/>
-    <property name="user.name" value="theodor"/>
-    <property name="stdout.encoding" value="UTF-8"/>
+    <property name="java.runtime.version" value="17.0.16+8-Ubuntu-0ubuntu122.04.1"/>
+    <property name="user.name" value="shudo"/>
     <property name="path.separator" value=":"/>
-    <property name="os.version" value="14.6"/>
+    <property name="os.version" value="5.15.167.4-microsoft-standard-WSL2"/>
     <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
     <property name="file.encoding" value="UTF-8"/>
     <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
-    <property name="java.vendor.version" value="Homebrew"/>
-    <property name="localRepository" value="/Users/theodor/.m2/repository"/>
-    <property name="java.vendor.url.bug" value="https://github.com/Homebrew/homebrew-core/issues"/>
-    <property name="java.io.tmpdir" value="/var/folders/vd/6cdngpr930q__r26x7prw2880000gn/T/"/>
-    <property name="java.version" value="25"/>
-    <property name="user.dir" value="/Users/theodor/Desktop/go/go-logic"/>
-    <property name="os.arch" value="aarch64"/>
+    <property name="localRepository" value="/home/shudo/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="https://bugs.launchpad.net/ubuntu/+source/openjdk-17"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="java.version" value="17.0.16"/>
+    <property name="user.dir" value="/mnt/c/studia/3sem/informatyka/lab4/Go-Game"/>
+    <property name="os.arch" value="amd64"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
     <property name="native.encoding" value="UTF-8"/>
-    <property name="java.library.path" value="/Users/theodor/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:."/>
+    <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib/x86_64-linux-gnu/jni:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib/jni:/lib:/usr/lib"/>
     <property name="java.vm.info" value="mixed mode, sharing"/>
-    <property name="stderr.encoding" value="UTF-8"/>
-    <property name="java.vendor" value="Homebrew"/>
-    <property name="java.vm.version" value="25"/>
-    <property name="stdin.encoding" value="UTF-8"/>
-    <property name="sun.io.unicode.encoding" value="UnicodeBig"/>
-    <property name="java.class.version" value="69.0"/>
+    <property name="java.vendor" value="Ubuntu"/>
+    <property name="java.vm.version" value="17.0.16+8-Ubuntu-0ubuntu122.04.1"/>
+    <property name="java.specification.maintenance.version" value="1"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="61.0"/>
   </properties>
-  <testcase name="testCannotPlaceOnOccupiedField" classname="pl.edu.go.BoardLogicTest" time="0.013"/>
+  <testcase name="testPassChangesPlayerAndTwoPassesEndGame" classname="pl.edu.go.BoardLogicTest" time="0.106"/>
+  <testcase name="testResignEndsGameAndSetsWinner" classname="pl.edu.go.BoardLogicTest" time="0.001"/>
+  <testcase name="testCannotPlaceOnOccupiedField" classname="pl.edu.go.BoardLogicTest" time="0.023"/>
   <testcase name="testCaptureSingleStone" classname="pl.edu.go.BoardLogicTest" time="0.001"/>
   <testcase name="testPlaceStoneOnEmptyField" classname="pl.edu.go.BoardLogicTest" time="0.001"/>
-  <testcase name="testSingleStoneLibertiesCenter" classname="pl.edu.go.BoardLogicTest" time="0.003"/>
-  <testcase name="testConnectedStonesFormGroup" classname="pl.edu.go.BoardLogicTest" time="0.0"/>
+  <testcase name="testIllegalMoveDoesNotChangePlayer" classname="pl.edu.go.BoardLogicTest" time="0.001"/>
+  <testcase name="testPlayMoveChangesCurrentPlayer" classname="pl.edu.go.BoardLogicTest" time="0.0"/>
+  <testcase name="testSingleStoneLibertiesCenter" classname="pl.edu.go.BoardLogicTest" time="0.0"/>
+  <testcase name="testConnectedStonesFormGroup" classname="pl.edu.go.BoardLogicTest" time="0.001"/>
   <testcase name="testCannotPlaceOutsideBoard" classname="pl.edu.go.BoardLogicTest" time="0.001"/>
   <testcase name="testCaptureGroup" classname="pl.edu.go.BoardLogicTest" time="0.001"/>
-  <testcase name="testSuicideForbiddenUnlessCapturing" classname="pl.edu.go.BoardLogicTest" time="0.0"/>
+  <testcase name="testGameInitialPlayerIsBlack" classname="pl.edu.go.BoardLogicTest" time="0.0"/>
+  <testcase name="testSuicideForbiddenUnlessCapturing" classname="pl.edu.go.BoardLogicTest" time="0.001"/>
 </testsuite>

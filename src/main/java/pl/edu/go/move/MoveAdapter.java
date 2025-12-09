@@ -1,12 +1,19 @@
 package pl.edu.go.move;
 
 /**
- * Wzorzec: Adapter
- * ---------------------------------
- * Adaptuje notację tekstową Go (np. "D4") do współrzędnych tablicy (x,y).
- * GUI lub klient sieciowy może przesyłać ruchy jako stringi,
- * a logika gry działa na indeksach tablicy.
+ * Klasa MoveAdapter — adapter pomiędzy notacją użytkownika a współrzędnymi planszy.
+ *
+ * Wzorzec projektowy:
+ * - Adapter:
+ *   - Tłumaczy zewnętrzną reprezentację ruchu (np. tekstową notację "D4")
+ *     na współrzędne (x, y) i ewentualnie obiekt Move.
+ *   - Pozwala utrzymać klasę Board niezależną od formatu danych wejściowych.
+ *
+ * Rola klasy:
+ * - zamiana danych z UI/klienta na formę zrozumiałą dla logiki gry.
  */
+
+
 public class MoveAdapter {
 
     public static int[] toInternal(String move) {

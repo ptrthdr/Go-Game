@@ -1,9 +1,13 @@
 package pl.edu.go;
 
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import pl.edu.go.board.Board;
+import pl.edu.go.game.Game;
+import pl.edu.go.game.GameResult;
+import pl.edu.go.game.PlayerColor;
 
 public class BoardLogicTest {
 
@@ -128,4 +132,84 @@ public class BoardLogicTest {
                 "Ruch samobójczy powinien być niedozwolony");
     }
 
+    // ====== DODATKOWE TESTY DLA GAME (logika wyższego poziomu) ======
+
+    @Test
+    public void testGameInitialPlayerIsBlack() {
+        Board b = new Board(5);
+        Game g = new Game(b);
+
+        assertEquals(PlayerColor.BLACK, g.getCurrentPlayer(),
+                "Na początku gry ruch powinien mieć BLACK");
+    }
+
+    @Test
+    public void testPlayMoveChangesCurrentPlayer() {
+        Board b = new Board(5);
+        Game g = new Game(b);
+
+        assertTrue(g.playMove(PlayerColor.BLACK, 2, 2),
+                "Pierwszy ruch BLACK powinien być legalny");
+
+        assertEquals(PlayerColor.WHITE, g.getCurrentPlayer(),
+                "Po ruchu BLACK kolej powinna przejść na WHITE");
+    }
+
+    @Test
+    public void testIllegalMoveDoesNotChangePlayer() {
+        Board b = new Board(5);
+        Game g = new Game(b);
+
+        // WHITE nie powinien móc zaczynać gry — ruch powinien być nielegalny
+        assertFalse(g.playMove(PlayerColor.WHITE, 2, 2),
+                "WHITE nie powinien móc zacząć gry jako pierwszy");
+
+        assertEquals(PlayerColor.BLACK, g.getCurrentPlayer(),
+                "Po nielegalnym ruchu gracz z ruchem powinien pozostać ten sam");
+    }
+
+    @Test
+    public void testPassChangesPlayerAndTwoPassesEndGame() {
+        Board b = new Board(5);
+        Game g = new Game(b);
+
+        g.pass(PlayerColor.BLACK);
+
+        assertFalse(g.isFinished(),
+                "Po jednym PASS gra nie powinna być zakończona");
+        assertEquals(PlayerColor.WHITE, g.getCurrentPlayer(),
+                "Po PASS BLACK ruch powinien mieć WHITE");
+
+        g.pass(PlayerColor.WHITE);
+
+        assertTrue(g.isFinished(),
+                "Po dwóch PASS z rzędu gra powinna się zakończyć");
+
+        GameResult result = g.getResult();
+        assertNotNull(result,
+                "Po zakończeniu gry wynik nie powinien być null");
+        assertNull(result.getWinner(),
+                "Przy dwóch PASS zwycięzca może być null (brak liczenia punktów)");
+        assertEquals("two passes", result.getReason(),
+                "Powód zakończenia gry powinien być 'two passes'");
+    }
+
+    @Test
+    public void testResignEndsGameAndSetsWinner() {
+        Board b = new Board(5);
+        Game g = new Game(b);
+
+        g.resign(PlayerColor.BLACK);
+
+        assertTrue(g.isFinished(),
+                "Po RESIGN gra powinna być zakończona");
+
+        GameResult result = g.getResult();
+        assertNotNull(result,
+                "Po RESIGN wynik nie powinien być null");
+        assertEquals(PlayerColor.WHITE, result.getWinner(),
+                "Jeśli BLACK się poddaje, wygrać powinien WHITE");
+        assertEquals("resign", result.getReason(),
+                "Powód zakończenia gry powinien być 'resign'");
+    }
 }

@@ -6,21 +6,25 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
- * Prosty klient konsolowy:
- * - łączy się z serwerem Go
- * - w osobnym wątku nasłuchuje komunikatów z serwera
- * - w głównym wątku czyta komendy użytkownika i wysyła je na serwer
+ * Klasa CliClient — klient konsolowy gry Go.
  *
- * Komendy:
- *   MOVE x y
- *   PASS
- *   RESIGN
- *   exit / quit  -> zakończenie klienta
+ * Rola klasy:
+ * - łączy się z serwerem (host + port),
+ * - w osobnym wątku nasłuchuje komunikatów z serwera:
+ *   * INFO, WELCOME, TURN, ERROR, END,
+ *   * BOARD / ROW / END_BOARD — opis aktualnej planszy,
+ * - parsuje BOARD / ROW / END_BOARD i rysuje planszę w czytelnej formie
+ *   (siatka z numerami wierszy i kolumn),
+ * - w głównej pętli czyta komendy użytkownika z klawiatury i wysyła je
+ *   do serwera (MOVE x y, PASS, RESIGN),
+ * - po otrzymaniu komunikatu END ... automatycznie kończy działanie.
  *
- * Po otrzymaniu od serwera komunikatu "END ..." klient automatycznie kończy pracę.
+ * Klasa pełni rolę prostego interfejsu tekstowego (UI) dla gry Go.
  */
 public class CliClient {
 
@@ -47,34 +51,17 @@ public class CliClient {
             PrintWriter out = new PrintWriter(
                     new OutputStreamWriter(socket.getOutputStream()), true);
 
-            // --- Wątek nasłuchujący serwera ---
-            Thread listener = new Thread(() -> {
-                try {
-                    String line;
-                    while ((line = in.readLine()) != null) {
-                        System.out.println(line);
-
-                        // jeśli serwer ogłasza koniec gry, kończymy klienta
-                        if (line.startsWith("END ")) {
-                            running = false;
-                            break;
-                        }
-                    }
-                    System.out.println("Server closed connection.");
-                } catch (IOException e) {
-                    System.out.println("Connection lost: " + e.getMessage());
-                    running = false;
-                }
-            }, "ServerListener");
-
-            // daemon = nie blokuje zamknięcia JVM po zakończeniu main
-            listener.setDaemon(true);
-            listener.start();
-
-            // --- Główna pętla: czytanie komend użytkownika ---
+            // Czytanie komend z klawiatury
             Scanner scanner = new Scanner(System.in);
             System.out.println("Commands: MOVE x y | PASS | RESIGN  (or: exit)");
 
+            // Wątek nasłuchujący serwera (startujemy po wypisaniu komend,
+            // żeby nie mieszać się z pierwszym rysowaniem planszy)
+            Thread listener = new Thread(() -> listenToServer(in), "ServerListener");
+            listener.setDaemon(true);
+            listener.start();
+
+            // Główna pętla: odczyt linii od użytkownika
             while (running && scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 if (line == null) {
@@ -85,7 +72,7 @@ public class CliClient {
                     continue;
                 }
 
-                // użytkownik chce zakończyć klienta
+                // użytkownik chce zakończyć klienta ręcznie
                 if (line.equalsIgnoreCase("quit") || line.equalsIgnoreCase("exit")) {
                     break;
                 }
@@ -98,5 +85,122 @@ public class CliClient {
         } catch (IOException e) {
             System.out.println("Cannot connect: " + e.getMessage());
         }
+    }
+
+    /**
+     * Wątek nasłuchujący komunikatów z serwera.
+     *
+     * Tutaj parsujemy:
+     * - BOARD <size>
+     * - ROW <ciąg znaków X/O/.>
+     * - END_BOARD
+     *
+     * oraz wypisujemy inne komunikaty (INFO, TURN, ERROR, END).
+     */
+    private static void listenToServer(BufferedReader in) {
+        Integer boardSize = null;
+        List<String> boardRows = new ArrayList<>();
+
+        try {
+            String line;
+            while ((line = in.readLine()) != null) {
+
+                // ---- Parsowanie planszy (BOARD/ROW/END_BOARD) ----
+
+                if (line.startsWith("BOARD ")) {
+                    // początek nowej planszy
+                    try {
+                        boardSize = Integer.parseInt(line.substring("BOARD ".length()).trim());
+                    } catch (NumberFormatException e) {
+                        boardSize = null;
+                    }
+                    boardRows.clear();
+                    // nie wypisujemy surowej linii BOARD
+                    continue;
+                }
+
+                if (line.startsWith("ROW ")) {
+                    // kolejny wiersz planszy
+                    if (boardSize != null) {
+                        String row = line.substring("ROW ".length());
+                        boardRows.add(row);
+                    }
+                    // nie wypisujemy surowej linii ROW
+                    continue;
+                }
+
+                if ("END_BOARD".equals(line)) {
+                    // koniec opisu planszy -> rysujemy ją
+                    if (boardSize != null && boardRows.size() == boardSize) {
+                        displayBoard(boardSize, boardRows);
+                    } else {
+                        System.out.println("(Received incomplete board data)");
+                    }
+                    boardSize = null;
+                    boardRows.clear();
+                    continue;
+                }
+
+                // ---- Inne komunikaty ----
+
+                System.out.println(line);
+
+                // koniec gry -> kończymy klienta
+                if (line.startsWith("END ")) {
+                    running = false;
+                    break;
+                }
+            }
+
+            System.out.println("Server closed connection.");
+        } catch (IOException e) {
+            System.out.println("Connection lost: " + e.getMessage());
+            running = false;
+        }
+    }
+
+    /**
+     * Rysuje planszę w terminalu na podstawie listy wierszy ('.', 'X', 'O').
+     *
+     * Przykład:
+     *      0 1 2 3 4
+     *   0  . . X . .
+     *   1  . O . . .
+     *   ...
+     */
+    private static void displayBoard(int size, List<String> rows) {
+        System.out.println();
+        System.out.println("Current board:");
+
+        // nagłówek z numerami kolumn
+        System.out.print("    ");
+        for (int x = 0; x < size; x++) {
+            System.out.print(x + " ");
+        }
+        System.out.println();
+
+        // każdy wiersz planszy
+        for (int y = 0; y < size; y++) {
+            String row = rows.get(y);
+
+            // numer wiersza z lewej
+            System.out.printf("%2d  ", y);
+
+            for (int x = 0; x < size; x++) {
+                char c = (x < row.length()) ? row.charAt(x) : '.';
+
+                // mapowanie na ładniejsze symbole
+                char symbol = switch (c) {
+                    case 'X' -> '●';  // black
+                    case 'O' -> '○';  // white
+                    case '.' -> '.';
+                    default -> c;
+                };
+
+                System.out.print(symbol + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
     }
 }

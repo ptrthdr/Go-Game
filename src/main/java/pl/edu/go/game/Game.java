@@ -5,14 +5,45 @@ import pl.edu.go.board.Board;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Klasa Game — logika gry na wyższym poziomie niż sama plansza.
+ *
+ * Wzorce projektowe:
+ * - Observer:
+ *   - Game pełni rolę "subject" (obserwowanego obiektu).
+ *   - Przechowuje listę GameObserver i powiadamia ich o:
+ *     * zmianie planszy (onBoardChanged),
+ *     * zmianie gracza (onPlayerToMoveChanged),
+ *     * zakończeniu gry (onGameEnded).
+ *
+ * Rola klasy:
+ * - przechowuje referencję do Board (silnika logiki Go),
+ * - pilnuje kolejności ruchów (BLACK/WHITE),
+ * - obsługuje wysokopoziomowe akcje:
+ *   * playMove(...) — wykonanie ruchu na planszy,
+ *   * pass(...) — pas, z licznikiem kolejnych passów,
+ *   * resign(...) — rezygnacja, ustawienie zwycięzcy i zakończenie gry,
+ * - powiadamia obserwatorów o każdej zmianie stanu gry.
+ *
+ * Klasa nie zna szczegółów komunikacji sieciowej ani UI — od tego są inne warstwy.
+ */
 public class Game {
 
     private final Board board;
-    private PlayerColor currentPlayer = PlayerColor.BLACK;
-    private boolean finished = false;
-    private GameResult result;
-    private int consecutivePasses = 0; // można wykorzystać później
 
+    // który gracz ma aktualnie ruch (zaczyna BLACK)
+    private PlayerColor currentPlayer = PlayerColor.BLACK;
+
+    // czy gra została zakończona
+    private boolean finished = false;
+
+    // wynik gry (ustawiany przy resign lub dwóch pasach)
+    private GameResult result;
+
+    // licznik kolejnych passów (np. dwa pasy = koniec gry)
+    private int consecutivePasses = 0;
+
+    // lista zarejestrowanych obserwatorów (np. GameSession)
     private final List<GameObserver> observers = new ArrayList<>();
 
     public Game(Board board) {
@@ -66,34 +97,42 @@ public class Game {
     // ------- LOGIKA WYSOKIEGO POZIOMU -------
 
     /**
-     * Próbuje zagrać ruch. Zwraca true, jeśli ruch był legalny.
+     * Próbuje wykonać ruch gracza player na polu (x, y).
+     *
+     * Zwraca:
+     * - true, jeśli ruch był legalny i został wykonany,
+     * - false, jeśli ruch był nielegalny (np. zły gracz, samobójstwo).
      */
     public boolean playMove(PlayerColor player, int x, int y) {
         if (finished) {
             return false;
         }
-        // opcjonalne pilnowanie kolejności ruchu:
+        // można tu dodatkowo pilnować kolejności ruchów
         if (player != currentPlayer) {
             return false;
         }
 
-        // TU korzystamy z Twojego API Board:
+        // delegacja do Board — niskopoziomowa logika ruchu
         boolean ok = board.playMove(player.toBoardColor(), x, y);
         if (!ok) {
             return false;
         }
 
-        // ruch legalny -> resetujemy pass-y i zmiana gracza
+        // ruch legalny -> resetujemy liczbę passów
         consecutivePasses = 0;
+
+        // zmiana gracza
         currentPlayer = currentPlayer.opposite();
 
+        // powiadamiamy obserwatorów (np. GameSession) o zmianie planszy i gracza
         notifyBoardChanged();
         notifyPlayerToMoveChanged();
         return true;
     }
 
     /**
-     * Pass danego gracza.
+     * Gracz player wykonuje PASS.
+     * Dwa kolejne passy mogą oznaczać koniec gry (w tej wersji wynik jest uproszczony).
      */
     public void pass(PlayerColor player) {
         if (finished) {
@@ -106,18 +145,20 @@ public class Game {
         consecutivePasses++;
         if (consecutivePasses >= 2) {
             finished = true;
-            // na Iterację 1 nie ma jeszcze liczenia punktów, więc winner może być null
+            // w tej iteracji nie liczymy punktów — zwycięzca może być null
             result = new GameResult(null, "two passes");
             notifyGameEnded();
             return;
         }
 
+        // zmiana gracza i powiadomienie obserwatorów
         currentPlayer = currentPlayer.opposite();
         notifyPlayerToMoveChanged();
     }
 
     /**
-     * Rezygnacja.
+     * Gracz player poddaje grę (RESIGN).
+     * Zwycięzcą zostaje przeciwnik.
      */
     public void resign(PlayerColor player) {
         if (finished) {

@@ -1,5 +1,15 @@
 package pl.edu.go.game;
 
+/**
+ * Klasa GameResult — prosty obiekt opisujący wynik gry.
+ *
+ * Rola klasy:
+ * - przechowuje:
+ *   * zwycięzcę (PlayerColor lub null, jeśli brak),
+ *   * powód zakończenia gry (np. "resign", "two passes"),
+ * - przekazywana do obserwatorów w metodzie onGameEnded.
+ */
+
 public class GameResult {
     private final PlayerColor winner;
     private final String reason; // np. "resign", "both passed"
