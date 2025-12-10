@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="pl.edu.go.BoardLogicTest" time="0.26" tests="13" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="pl.edu.go.GameSessionTest" time="0.109" tests="3" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -51,17 +51,15 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="61.0"/>
   </properties>
-  <testcase name="testPassChangesPlayerAndTwoPassesEndGame" classname="pl.edu.go.BoardLogicTest" time="0.127"/>
-  <testcase name="testResignEndsGameAndSetsWinner" classname="pl.edu.go.BoardLogicTest" time="0.001"/>
-  <testcase name="testCannotPlaceOnOccupiedField" classname="pl.edu.go.BoardLogicTest" time="0.03"/>
-  <testcase name="testCaptureSingleStone" classname="pl.edu.go.BoardLogicTest" time="0.001"/>
-  <testcase name="testPlaceStoneOnEmptyField" classname="pl.edu.go.BoardLogicTest" time="0.001"/>
-  <testcase name="testIllegalMoveDoesNotChangePlayer" classname="pl.edu.go.BoardLogicTest" time="0.0"/>
-  <testcase name="testPlayMoveChangesCurrentPlayer" classname="pl.edu.go.BoardLogicTest" time="0.002"/>
-  <testcase name="testSingleStoneLibertiesCenter" classname="pl.edu.go.BoardLogicTest" time="0.002"/>
-  <testcase name="testConnectedStonesFormGroup" classname="pl.edu.go.BoardLogicTest" time="0.001"/>
-  <testcase name="testCannotPlaceOutsideBoard" classname="pl.edu.go.BoardLogicTest" time="0.001"/>
-  <testcase name="testCaptureGroup" classname="pl.edu.go.BoardLogicTest" time="0.001"/>
-  <testcase name="testGameInitialPlayerIsBlack" classname="pl.edu.go.BoardLogicTest" time="0.001"/>
-  <testcase name="testSuicideForbiddenUnlessCapturing" classname="pl.edu.go.BoardLogicTest" time="0.001"/>
+  <testcase name="testLegalMoveUpdatesTurn" classname="pl.edu.go.GameSessionTest" time="0.1">
+    <system-out><![CDATA[Received from BLACK: MOVE 2 2
+]]></system-out>
+  </testcase>
+  <testcase name="testStartGameSendsWelcomeBoardAndTurn" classname="pl.edu.go.GameSessionTest" time="0.001"/>
+  <testcase name="testWrongPlayerMoveProducesError" classname="pl.edu.go.GameSessionTest" time="0.003">
+    <system-out><![CDATA[Received from BLACK: MOVE 2 2
+Received from BLACK: MOVE 1 1
+Error for BLACK: Not your turn: BLACK
+]]></system-out>
+  </testcase>
 </testsuite>

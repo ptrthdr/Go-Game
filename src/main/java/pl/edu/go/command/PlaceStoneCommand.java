@@ -34,10 +34,16 @@ public class PlaceStoneCommand implements GameCommand {
     }
 
     @Override
-    public void execute(Game game) throws Exception {
+    public void execute(Game game) {
+        // Sprawdzenie tury: jeśli to nie ten gracz, zgłaszamy błąd
+        if (game.getCurrentPlayer() != player) {
+            throw new IllegalStateException("Not your turn: " + player.name());
+        }
+
         boolean ok = game.playMove(player, x, y);
         if (!ok) {
-            throw new Exception("Illegal move at (" + x + ", " + y + ")");
+            // Tu mamy inne przypadki: samobójstwo, zajęte pole itd.
+            throw new IllegalStateException("Illegal move at (" + x + ", " + y + ")");
         }
     }
 }

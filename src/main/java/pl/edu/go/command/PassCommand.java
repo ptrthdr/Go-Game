@@ -30,6 +30,9 @@ public class PassCommand implements GameCommand {
 
     @Override
     public void execute(Game game) {
+        if (game.getCurrentPlayer() != player) {
+            throw new IllegalStateException("Not your turn: " + player.name());
+        }
         game.pass(player);
     }
 }

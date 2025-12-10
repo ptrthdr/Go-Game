@@ -33,7 +33,7 @@ public class CliClient {
 
     public static void main(String[] args) {
         String host = "localhost";
-        int port = 5000;
+        int port = 5001;
 
         // opcjonalne parametry: host port
         if (args.length >= 1) {
@@ -53,7 +53,7 @@ public class CliClient {
 
             // Czytanie komend z klawiatury
             Scanner scanner = new Scanner(System.in);
-            System.out.println("Commands: MOVE x y | PASS | RESIGN  (or: exit)");
+            System.out.println("Commands: MOVE <col> <row> (np. MOVE B 2) | PASS | RESIGN  (or: exit)");
 
             // Wątek nasłuchujący serwera (startujemy po wypisaniu komend,
             // żeby nie mieszać się z pierwszym rysowaniem planszy)
@@ -77,8 +77,31 @@ public class CliClient {
                     break;
                 }
 
+                // Obsługa skróconego formatu: MOVE B 2 (kolumna jako litera)
+                String toSend = line;
+                // Umożliwiamy format: MOVE C 3 (kolumna jako litera)
+                String upper = line.toUpperCase();
+
+                if (upper.startsWith("MOVE")) {
+                    String[] parts = upper.split("\\s+");
+                    if (parts.length == 3) {
+                        // parts[0] = MOVE, parts[1] = kolumna (np. B), parts[2] = wiersz (np. 2)
+                        String colPart = parts[1];
+                        String rowPart = parts[2];
+
+                        if (colPart.length() == 1 && colPart.charAt(0) >= 'A' && colPart.charAt(0) <= 'Z') {
+                            char colChar = colPart.charAt(0);
+                            int x = colChar - 'A';           // A -> 0, B -> 1, ...
+                            int y = Integer.parseInt(rowPart); // zakładamy, że wiersze są podawane jako 0,1,2,...
+
+                            toSend = "MOVE " + x + " " + y;
+                        }
+                    }
+                    // Jeśli format nie pasuje (np. MOVE 1 2), to wysyłamy linię bez zmian.
+                }
+
                 // wysyłamy komendę do serwera
-                out.println(line);
+                out.println(toSend);
             }
 
             System.out.println("Client exiting...");
@@ -172,12 +195,14 @@ public class CliClient {
         System.out.println();
         System.out.println("Current board:");
 
-        // nagłówek z numerami kolumn
+        // nagłówek z literami kolumn (A, B, C, ...)
         System.out.print("    ");
         for (int x = 0; x < size; x++) {
-            System.out.print(x + " ");
+            char col = (char) ('A' + x);
+            System.out.print(col + " ");
         }
         System.out.println();
+
 
         // każdy wiersz planszy
         for (int y = 0; y < size; y++) {
