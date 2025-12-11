@@ -1,7 +1,7 @@
 @startuml
 skinparam classAttributeIconSize 0
 skinparam dpi 150
-title Diagram klas – Logika gry Go (Osoba A)
+title Diagram klas - Logika gry Go (Osoba A)
 
 package board {
     class Board {
@@ -52,7 +52,6 @@ package move {
     }
 }
 
-' ===== RELACJE =====
 
 Board --> Stone : uses
 Board --> StoneGroup : creates groups
