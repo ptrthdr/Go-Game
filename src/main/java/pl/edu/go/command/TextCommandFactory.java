@@ -1,48 +1,52 @@
 package pl.edu.go.command;
 
 import pl.edu.go.game.PlayerColor;
+import pl.edu.go.move.Move;
+import pl.edu.go.move.MoveFactory;
 
-/**
- * Klasa TextCommandFactory — fabryka komend na podstawie tekstu protokołu.
- *
- * Wzorce projektowe:
- * - Factory Method:
- *   - Na podstawie tekstu (np. "MOVE 3 4") tworzy odpowiedni obiekt
- *     konkretnej komendy: PlaceStoneCommand, PassCommand, ResignCommand.
- *
- * - Command:
- *   - Tworzone obiekty implementują GameCommand i są później wykonywane
- *     na obiekcie Game.
- *
- * Rola klasy:
- * - parsuje linie otrzymane od klienta,
- * - wykrywa typ komendy (MOVE / PASS / RESIGN),
- * - zwraca gotowy obiekt GameCommand do wykonania przez serwer.
- */
 public class TextCommandFactory {
 
-    /**
-     * Tworzy obiekt GameCommand na podstawie wiadomości tekstowej.
-     *
-     * Przykłady:
-     * - "MOVE 3 4"
-     * - "PASS"
-     * - "RESIGN"
-     */
     public GameCommand fromNetworkMessage(String message, PlayerColor player) {
-        String[] parts = message.trim().split("\\s+");
+        if (message == null) {
+            throw new IllegalArgumentException("Empty command");
+        }
+
+        String trimmed = message.trim();
+        if (trimmed.isEmpty()) {
+            throw new IllegalArgumentException("Empty command");
+        }
+
+        String[] parts = trimmed.split("\\s+");
         String keyword = parts[0].toUpperCase();
 
         return switch (keyword) {
             case "MOVE" -> {
-                // spodziewamy się dwóch liczb po słowie MOVE
-                int x = Integer.parseInt(parts[1]);
-                int y = Integer.parseInt(parts[2]);
-                yield new PlaceStoneCommand(x, y, player);
+                if (parts.length != 3) {
+                    throw new IllegalArgumentException("MOVE requires two integers: MOVE <x> <y>");
+                }
+                int x, y;
+                try {
+                    x = Integer.parseInt(parts[1]);
+                    y = Integer.parseInt(parts[2]);
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("MOVE coordinates must be integers: MOVE <x> <y>");
+                }
+                Move move = MoveFactory.createMove(player.toBoardColor(), x, y);
+                yield new PlaceStoneCommand(move);
             }
-            case "PASS" -> new PassCommand(player);
-            case "RESIGN" -> new ResignCommand(player);
-            default -> throw new IllegalArgumentException("Unknown command: " + message);
+            case "PASS" -> {
+                if (parts.length != 1) {
+                    throw new IllegalArgumentException("PASS takes no arguments");
+                }
+                yield new PassCommand(player);
+            }
+            case "RESIGN" -> {
+                if (parts.length != 1) {
+                    throw new IllegalArgumentException("RESIGN takes no arguments");
+                }
+                yield new ResignCommand(player);
+            }
+            default -> throw new IllegalArgumentException("Unknown command: " + keyword);
         };
     }
 }

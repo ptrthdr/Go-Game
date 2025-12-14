@@ -1,49 +1,34 @@
 package pl.edu.go.game;
 
 import pl.edu.go.board.Board;
+import pl.edu.go.move.Move;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Klasa Game — logika gry na wyższym poziomie niż sama plansza.
+ * Game — „silnik wysokiego poziomu” nad Board.
  *
- * Wzorce projektowe:
- * - Observer:
- *   - Game pełni rolę "subject" (obserwowanego obiektu).
- *   - Przechowuje listę GameObserver i powiadamia ich o:
- *     * zmianie planszy (onBoardChanged),
- *     * zmianie gracza (onPlayerToMoveChanged),
- *     * zakończeniu gry (onGameEnded).
+ * Ściąga (Single Source of Truth):
+ * - Game pilnuje: finished, tura (currentPlayer), PASS/RESIGN, wynik, powiadomienia Observer.
+ * - Board pilnuje: reguły planszy (zajęte pole, bicie, oddechy, samobójstwo, bounds).
+ * - Komendy (Command) NIE walidują tury/finished — tylko delegują do Game.
  *
- * Rola klasy:
- * - przechowuje referencję do Board (silnika logiki Go),
- * - pilnuje kolejności ruchów (BLACK/WHITE),
- * - obsługuje wysokopoziomowe akcje:
- *   * playMove(...) — wykonanie ruchu na planszy,
- *   * pass(...) — pas, z licznikiem kolejnych passów,
- *   * resign(...) — rezygnacja, ustawienie zwycięzcy i zakończenie gry,
- * - powiadamia obserwatorów o każdej zmianie stanu gry.
- *
- * Klasa nie zna szczegółów komunikacji sieciowej ani UI — od tego są inne warstwy.
+ * Observer:
+ * - notifyBoardChanged() po udanym MOVE,
+ * - notifyPlayerToMoveChanged() po zmianie tury (MOVE/PASS),
+ * - notifyGameEnded() po końcu gry (2xPASS lub RESIGN).
  */
 public class Game {
 
     private final Board board;
 
-    // który gracz ma aktualnie ruch (zaczyna BLACK)
-    private PlayerColor currentPlayer = PlayerColor.BLACK;
-
-    // czy gra została zakończona
+    // Ściąga: stan gry
+    private PlayerColor currentPlayer = PlayerColor.BLACK; // zaczyna BLACK
     private boolean finished = false;
-
-    // wynik gry (ustawiany przy resign lub dwóch pasach)
     private GameResult result;
 
-    // licznik kolejnych passów (np. dwa pasy = koniec gry)
-    private int consecutivePasses = 0;
-
-    // lista zarejestrowanych obserwatorów (np. GameSession)
+    private int consecutivePasses = 0; // 2 passy => koniec gry (uprośc.)
     private final List<GameObserver> observers = new ArrayList<>();
 
     public Game(Board board) {
@@ -97,73 +82,79 @@ public class Game {
     // ------- LOGIKA WYSOKIEGO POZIOMU -------
 
     /**
-     * Próbuje wykonać ruch gracza player na polu (x, y).
-     *
-     * Zwraca:
-     * - true, jeśli ruch był legalny i został wykonany,
-     * - false, jeśli ruch był nielegalny (np. zły gracz, samobójstwo).
+     * Wykonanie ruchu przez obiekt Move.
+     * Move to dane (kolor + x/y), walidacja zawsze tu w Game + Board.
      */
-    public boolean playMove(PlayerColor player, int x, int y) {
-        if (finished) {
-            return false;
-        }
-        // można tu dodatkowo pilnować kolejności ruchów
-        if (player != currentPlayer) {
-            return false;
+    public void playMove(Move move) {
+        if (move == null) {
+            throw new IllegalArgumentException("Move is null");
         }
 
-        // delegacja do Board — niskopoziomowa logika ruchu
-        boolean ok = board.playMove(player.toBoardColor(), x, y);
-        if (!ok) {
-            return false;
-        }
-
-        // ruch legalny -> resetujemy liczbę passów
-        consecutivePasses = 0;
-
-        // zmiana gracza
-        currentPlayer = currentPlayer.opposite();
-
-        // powiadamiamy obserwatorów (np. GameSession) o zmianie planszy i gracza
-        notifyBoardChanged();
-        notifyPlayerToMoveChanged();
-        return true;
+        PlayerColor player = PlayerColor.fromBoardColor(move.getColor());
+        playMove(player, move.getX(), move.getY());
     }
 
     /**
-     * Gracz player wykonuje PASS.
-     * Dwa kolejne passy mogą oznaczać koniec gry (w tej wersji wynik jest uproszczony).
+     * Wykonanie ruchu na (x,y) przez konkretnego gracza.
+     *
+     * Zasada: rzucamy wyjątek z czytelnym komunikatem, zamiast zwracać false.
+     * Dzięki temu Command jest cienki, a GameSession zamienia to na "ERROR ...".
+     */
+    public void playMove(PlayerColor player, int x, int y) {
+        if (finished) {
+            throw new IllegalStateException("Game already finished");
+        }
+        if (player != currentPlayer) {
+            throw new IllegalStateException("Not your turn: " + player.name());
+        }
+
+        // Board decyduje o legalności na planszy (zajęte, samobójstwo, bicie, bounds)
+        boolean ok = board.playMove(player.toBoardColor(), x, y);
+        if (!ok) {
+            throw new IllegalStateException("Illegal move at (" + x + ", " + y + ")");
+        }
+
+        // Udany MOVE => reset passów, zmiana tury, powiadomienia
+        consecutivePasses = 0;
+        currentPlayer = currentPlayer.opposite();
+
+        notifyBoardChanged();
+        notifyPlayerToMoveChanged();
+    }
+
+    /**
+     * PASS.
+     * 2 kolejne passy => koniec gry (bez liczenia punktów).
      */
     public void pass(PlayerColor player) {
         if (finished) {
-            return;
+            throw new IllegalStateException("Game already finished");
         }
         if (player != currentPlayer) {
-            return;
+            throw new IllegalStateException("Not your turn: " + player.name());
         }
 
         consecutivePasses++;
         if (consecutivePasses >= 2) {
             finished = true;
-            // w tej iteracji nie liczymy punktów — zwycięzca może być null
             result = new GameResult(null, "two passes");
             notifyGameEnded();
             return;
         }
 
-        // zmiana gracza i powiadomienie obserwatorów
         currentPlayer = currentPlayer.opposite();
         notifyPlayerToMoveChanged();
     }
 
     /**
-     * Gracz player poddaje grę (RESIGN).
-     * Zwycięzcą zostaje przeciwnik.
+     * RESIGN.
+     * wygrywa przeciwnik, gra kończy się od razu.
      */
     public void resign(PlayerColor player) {
         if (finished) {
-            return;
+            throw new IllegalStateException("Game already finished");
         }
+
         finished = true;
         result = new GameResult(player.opposite(), "resign");
         notifyGameEnded();

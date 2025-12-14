@@ -148,7 +148,7 @@ public class BoardLogicTest {
         Board b = new Board(5);
         Game g = new Game(b);
 
-        assertTrue(g.playMove(PlayerColor.BLACK, 2, 2),
+        assertDoesNotThrow(() -> g.playMove(PlayerColor.BLACK, 2, 2),
                 "Pierwszy ruch BLACK powinien być legalny");
 
         assertEquals(PlayerColor.WHITE, g.getCurrentPlayer(),
@@ -160,8 +160,9 @@ public class BoardLogicTest {
         Board b = new Board(5);
         Game g = new Game(b);
 
-        // WHITE nie powinien móc zaczynać gry — ruch powinien być nielegalny
-        assertFalse(g.playMove(PlayerColor.WHITE, 2, 2),
+        // WHITE nie powinien móc zaczynać gry — spodziewamy się wyjątku
+        assertThrows(IllegalStateException.class,
+                () -> g.playMove(PlayerColor.WHITE, 2, 2),
                 "WHITE nie powinien móc zacząć gry jako pierwszy");
 
         assertEquals(PlayerColor.BLACK, g.getCurrentPlayer(),

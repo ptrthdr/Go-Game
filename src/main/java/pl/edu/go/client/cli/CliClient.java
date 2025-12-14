@@ -10,6 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import pl.edu.go.move.MoveAdapter;
+import java.util.Locale;
+
+
 /**
  * Klasa CliClient — klient konsolowy gry Go.
  *
@@ -78,32 +82,32 @@ public class CliClient {
                 }
 
                 // Obsługa skróconego formatu: MOVE B 2 (kolumna jako litera)
-                String toSend = line;
-                // Umożliwiamy format: MOVE C 3 (kolumna jako litera)
-                String upper = line.toUpperCase();
-
-                if (upper.startsWith("MOVE")) {
-                    String[] parts = upper.split("\\s+");
-                    if (parts.length == 3) {
-                        // parts[0] = MOVE, parts[1] = kolumna (np. B), parts[2] = wiersz (np. 2)
-                        String colPart = parts[1];
-                        String rowPart = parts[2];
-
-                        if (colPart.length() == 1 && colPart.charAt(0) >= 'A' && colPart.charAt(0) <= 'Z') {
-                            char colChar = colPart.charAt(0);
-                            int x = colChar - 'A';           // A -> 0, B -> 1, ...
-                            int y = Integer.parseInt(rowPart); // zakładamy, że wiersze są podawane jako 0,1,2,...
-
-                            toSend = "MOVE " + x + " " + y;
-                        }
-                    }
-                    // Jeśli format nie pasuje (np. MOVE 1 2), to wysyłamy linię bez zmian.
+                String trimmed = line.trim();
+                if (trimmed.isEmpty()) {
+                    continue;
                 }
 
-                // wysyłamy komendę do serwera
-                out.println(toSend);
-            }
+                String upper = trimmed.toUpperCase(Locale.ROOT);
 
+                // MOVE: tylko notacja literowa (B2 albo B 2). Inaczej błąd i nie wysyłamy nic.
+                if (upper.startsWith("MOVE")) {
+                    String payload = trimmed.substring(4).trim(); // wszystko po "MOVE"
+
+                    try {
+                        int[] pos = MoveAdapter.toInternal(payload); // akceptuje: B2, B 2
+                        // wysyłamy do serwera 0-based (silnik)
+                        out.println("MOVE " + pos[0] + " " + pos[1]);
+                    } catch (IllegalArgumentException ex) {
+                        System.out.println("ERROR: " + ex.getMessage());
+                        System.out.println("Allowed format: MOVE B2  or  MOVE B 2  (row counted from 1).");
+                        // nie wysyłamy nic do serwera, użytkownik wpisuje ponownie
+                    }
+
+                } else {
+                    // inne komendy (PASS/RESIGN/QUIT/itd.) lecą bez zmian
+                    out.println(trimmed);
+                }
+            }
             System.out.println("Client exiting...");
         } catch (IOException e) {
             System.out.println("Cannot connect: " + e.getMessage());

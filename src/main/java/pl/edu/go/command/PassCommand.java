@@ -1,24 +1,28 @@
 package pl.edu.go.command;
 
-/**
- * PassCommand — komenda reprezentująca pas gracza.
- *
- * Wzorzec projektowy:
- * - Command:
- *   - Implementuje GameCommand, enkapsuluje akcję "gracz pasuje".
- *
- * Rola klasy:
- * - przechowuje informację, który gracz pasuje (PlayerColor),
- * - w metodzie execute(Game game) wywołuje game.pass(player),
- *   co może zmienić aktualnego gracza lub zakończyć grę po dwóch pasach.
- *
- * Użycie:
- * - tworzona w TextCommandFactory na podstawie komunikatu "PASS"
- *   otrzymanego od klienta.
- */
-
 import pl.edu.go.game.Game;
 import pl.edu.go.game.PlayerColor;
+
+/**
+ * PassCommand — komenda "PASS".
+ *
+ * Wzorce:
+ * - Command:
+ *   - reprezentuje akcję PASS jako obiekt GameCommand.
+ *
+ * Skąd wiemy, kto pasuje:
+ * - PlayerColor nie pochodzi z tekstu "PASS",
+ * - jest brany z kontekstu serwera (ClientHandler -> GameSession -> TextCommandFactory).
+ *
+ * Zasada odpowiedzialności:
+ * - PassCommand nie sprawdza tury/finished.
+ * - Game.pass(player) jest jedynym miejscem walidacji (single source of truth).
+ *
+ * Skutek:
+ * - PASS zmienia turę,
+ * - dwa kolejne PASS kończą grę (w uproszczeniu).
+ */
+
 
 public class PassCommand implements GameCommand {
 
@@ -30,9 +34,7 @@ public class PassCommand implements GameCommand {
 
     @Override
     public void execute(Game game) {
-        if (game.getCurrentPlayer() != player) {
-            throw new IllegalStateException("Not your turn: " + player.name());
-        }
+        // bez checka tury tutaj
         game.pass(player);
     }
 }

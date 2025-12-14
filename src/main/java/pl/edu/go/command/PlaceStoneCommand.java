@@ -1,49 +1,38 @@
 package pl.edu.go.command;
 
+import pl.edu.go.game.Game;
+import pl.edu.go.move.Move;
+
 /**
- * PlaceStoneCommand — komenda reprezentująca ruch z postawieniem kamienia.
+ * PlaceStoneCommand — komenda ruchu "postaw kamień".
  *
- * Wzorzec projektowy:
+ * Wzorce:
  * - Command:
- *   - Implementuje GameCommand, enkapsuluje dane ruchu (x, y, kolor gracza)
- *     oraz logikę jego wykonania.
+ *   - enkapsuluje żądanie wykonania ruchu jako obiekt,
+ *   - pozwala GameSession traktować MOVE/PASS/RESIGN jednolicie (GameCommand.execute).
  *
- * Rola klasy:
- * - w metodzie execute(Game game) próbuje wykonać ruch:
- *   * wywołuje game.playMove(player, x, y),
- *   * w razie nielegalnego ruchu zgłasza wyjątek z opisem.
+ * Zasada odpowiedzialności:
+ * - PlaceStoneCommand NIE waliduje tury ani legalności ruchu.
+ * - Walidacja jest SINGLE SOURCE OF TRUTH w Game (tura/finished) i Board (reguły planszy).
  *
- * Użycie:
- * - tworzona na serwerze w TextCommandFactory na podstawie komunikatu
- *   tekstowego "MOVE x y".
+ * Przepływ:
+ * - TextCommandFactory parsuje "MOVE x y" i buduje Move przez MoveFactory,
+ * - PlaceStoneCommand wywołuje game.playMove(move),
+ * - w razie błędu Game rzuca wyjątek, który GameSession mapuje na "ERROR ...".
  */
 
-import pl.edu.go.game.Game;
-import pl.edu.go.game.PlayerColor;
 
 public class PlaceStoneCommand implements GameCommand {
 
-    private final int x;
-    private final int y;
-    private final PlayerColor player;
+    private final Move move;
 
-    public PlaceStoneCommand(int x, int y, PlayerColor player) {
-        this.x = x;
-        this.y = y;
-        this.player = player;
+    public PlaceStoneCommand(Move move) {
+        this.move = move;
     }
 
     @Override
     public void execute(Game game) {
-        // Sprawdzenie tury: jeśli to nie ten gracz, zgłaszamy błąd
-        if (game.getCurrentPlayer() != player) {
-            throw new IllegalStateException("Not your turn: " + player.name());
-        }
-
-        boolean ok = game.playMove(player, x, y);
-        if (!ok) {
-            // Tu mamy inne przypadki: samobójstwo, zajęte pole itd.
-            throw new IllegalStateException("Illegal move at (" + x + ", " + y + ")");
-        }
+        // bez żadnych checków tury tutaj
+        game.playMove(move);
     }
 }
