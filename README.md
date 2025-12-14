@@ -2,9 +2,9 @@
 
 Projekt zaliczeniowy z laboratorium – uproszczona gra **Go** w architekturze **klient–serwer**.
 
-* logika gry (plansza, bicia, zakaz samobójstwa) po stronie serwera,
+* logika gry (plansza, bicie, zakaz samobójstwa) po stronie serwera,
 * dwaj klienci łączą się do serwera i grają przeciwko sobie,
-* interfejs tekstowy (terminal) – rysowanie planszy ascii,
+* interfejs tekstowy (terminal) – rysowanie planszy,
 * projekt zrealizowany w Javie 17 z użyciem **Mavena**.
 
 ---
@@ -17,19 +17,16 @@ Zaimplementowane są zasady Go wymagane w iteracji 1:
 * plansza kwadratowa (domyślnie 9×9),
 * kolejność ruchów: **BLACK zaczyna**, potem naprzemiennie,
 * legalny ruch:
-
   * kamień stawiany na puste pole,
   * bicie całych grup przeciwnika po utracie oddechów,
   * **zakaz samobójstwa** (chyba że ruch bije kamienie przeciwnika),
 * możliwe akcje gracza:
-
-  * `MOVE x y` – ruch na podane współrzędne,
+  * `MOVE B2` lub `MOVE B 2` – ruch w notacji literowej (kolumna jako litera),
   * `PASS` – pas,
-  * `RESIGN` – rezygnacja (przyznanie się do przegranej),
+  * `RESIGN` – rezygnacja,
 * koniec gry:
-
-  * jeden z graczy wpisuje `RESIGN` → drugi wygrywa,
-  * (logika dwóch pasów jest przygotowana w `Game`, ale na razie nie liczymy punktów).
+  * `RESIGN` → przeciwnik wygrywa,
+  * dwa kolejne `PASS` → koniec gry z powodem `two passes` (bez liczenia punktów).
 
 ---
 
@@ -49,15 +46,11 @@ W katalogu z `pom.xml`:
 mvn clean compile
 ```
 
-Po udanym kompilowaniu będzie dostępny katalog `target/classes` z plikami `.class`.
-
 ---
 
 ## 4. Uruchamianie – serwer i dwaj klienci
 
 ### 4.1. Uruchom serwer
-
-W terminalu:
 
 ```bash
 java -cp target/classes pl.edu.go.server.GameServer
@@ -65,14 +58,14 @@ java -cp target/classes pl.edu.go.server.GameServer
 
 Serwer:
 
-* nasłuchuje na porcie **5000**,
-* tworzy planszę 9×9,
+* nasłuchuje na porcie **5001**,
+* tworzy planszę **9×9**,
 * czeka na dwóch graczy.
 
-W logu serwera zobaczysz m.in.:
+Przykładowy log serwera:
 
 ```text
-Server listening on port 5000
+Server listening on port 5001
 First player connected (BLACK)
 Second player connected (WHITE)
 Game started. Waiting for moves...
@@ -80,151 +73,142 @@ Game started. Waiting for moves...
 
 ### 4.2. Uruchom dwóch klientów (w dwóch osobnych terminalach)
 
-Każdy klient:
-
 ```bash
 java -cp target/classes pl.edu.go.client.cli.CliClient
 ```
 
-Po połączeniu zobaczysz coś w stylu:
+Po połączeniu klient wypisze m.in.:
 
 ```text
-Connected to localhost:5000
+Connected to localhost:5001
 INFO Connected as BLACK
-Commands: MOVE x y | PASS | RESIGN  (or: exit)
+Commands: MOVE B2 / MOVE B 2 | PASS | RESIGN  (or: exit)
 WELCOME BLACK
 INFO Game started. BLACK moves first.
-
-Current board:
-    0 1 2 3 4 5 6 7 8
- 0  . . . . . . . . .
- 1  . . . . . . . . .
- ...
- 8  . . . . . . . . .
-
+...
 TURN BLACK
 ```
 
-Pierwszy zalogowany klient gra czarnymi (**BLACK**), drugi – białymi (**WHITE**).
+Pierwszy podłączony klient gra czarnymi (**BLACK**), drugi – białymi (**WHITE**).
 
 ---
 
-## 5. Sterowanie z konsoli
+## 5. Sterowanie z konsoli (CLI)
 
-W oknie klienta wpisujesz komendy:
+### 5.1. Ruch (MOVE) – tylko notacja z literą
 
-* **ruch**:
-
-  ```text
-  MOVE x y
-  ```
-
-  gdzie `x` i `y` to współrzędne od `0` do `size-1`, np.:
-
-  ```text
-  MOVE 3 4
-  ```
-
-* **pas**:
-
-  ```text
-  PASS
-  ```
-
-* **rezygnacja** (przegrana z własnej woli):
-
-  ```text
-  RESIGN
-  ```
-
-* **wyjście z klienta** (bez wysyłania komendy do serwera):
-
-  ```text
-  exit
-  ```
-
-  lub
-
-  ```text
-  quit
-  ```
-
-Po każdym poprawnym ruchu:
-
-* serwer wysyła nowy stan planszy (`BOARD / ROW / END_BOARD`),
-* klient rysuje ją w terminalu jako grid z symbolami:
-
-  * `●` – kamień czarny,
-  * `○` – kamień biały,
-  * `.` – puste pole.
-
-Po zakończeniu gry (np. po `RESIGN`) serwer wysyła:
+Dozwolone formaty:
 
 ```text
-END BLACK resign
+MOVE B2
+MOVE B 2
+```
+
+Zasady:
+
+* kolumny to litery `A..` (A=0, B=1, C=2, …),
+* wiersze użytkownik wpisuje jako liczby **od 1 do size** (np. `2` oznacza drugi wiersz),
+* klient konwertuje notację użytkownika na współrzędne 0-based.
+
+Uwaga: **serwer nie przyjmuje notacji literowej**. Do serwera zawsze wysyłane jest:
+
+```text
+MOVE x y
+```
+
+gdzie `x` i `y` są liczbami 0-based.
+
+Jeżeli użytkownik wpisze zły format (np. `MOVE 1 2`), klient wypisze błąd i **nie wyśle nic** do serwera.
+
+### 5.2. PASS
+
+```text
+PASS
+```
+
+### 5.3. RESIGN
+
+```text
+RESIGN
+```
+
+### 5.4. Wyjście z klienta (lokalnie)
+
+```text
+exit
 ```
 
 lub
 
 ```text
+quit
+```
+
+Po każdym poprawnym ruchu serwer wysyła nowy stan planszy (`BOARD / ROW / END_BOARD`), a klient rysuje ją w terminalu jako grid z symbolami:
+
+* `●` – kamień czarny,
+* `○` – kamień biały,
+* `.` – puste pole.
+
+Po zakończeniu gry serwer wysyła np.:
+
+```text
 END WHITE resign
 ```
 
-Klient wyświetla ten komunikat i **automatycznie kończy działanie**.
+albo przy dwóch pasach:
+
+```text
+END NONE two passes
+```
+
+Klient wyświetla komunikat `END ...` i **automatycznie kończy działanie**.
 
 ---
 
 ## 6. Protokół tekstowy klient–serwer
 
-Komunikacja opiera się na prostym protokole tekstowym (jedna linia = jedna wiadomość).
+Komunikacja to protokół tekstowy: jedna linia = jedna wiadomość.
 
-### 6.1. Komendy od klienta do serwera
+### 6.1. Komendy klient → serwer (protokół)
 
-* `MOVE x y` – próba zagrania kamienia na `(x,y)`,
-* `PASS` – pas,
-* `RESIGN` – rezygnacja.
+Serwer rozumie wyłącznie:
 
-Serwer rozpoznaje komendy w `GameSession` przy pomocy **TextCommandFactory** i **Command**:
+* `MOVE x y` – dokładnie dwa argumenty, obie wartości muszą być liczbami całkowitymi,
+* `PASS` – bez argumentów,
+* `RESIGN` – bez argumentów.
 
-```java
-GameCommand command = commandFactory.fromNetworkMessage(trimmed, from.getColor());
-command.execute(game);
+Walidacja formatu odbywa się w `TextCommandFactory`. Błędne formaty skutkują komunikatem `ERROR ...` (serwer nie crashuje).
+
+### 6.2. Odpowiedzi serwer → klient
+
+* `INFO <tekst>` – komunikaty informacyjne,
+* `WELCOME BLACK|WHITE` – przypisanie koloru klientowi,
+* `TURN BLACK|WHITE` – informacja o turze,
+* `ERROR <opis>` – błąd (np. zły format komendy lub nielegalny ruch),
+* `END <WINNER> <reason>` – koniec gry,
+* opis planszy:
+
+```text
+BOARD <size>
+ROW <wiersz0>
+ROW <wiersz1>
+...
+ROW <wierszN-1>
+END_BOARD
 ```
 
-### 6.2. Odpowiedzi od serwera do klienta
+gdzie `<wiersz>` to ciąg znaków `'.'`, `'X'`, `'O'`:
 
-* `INFO <tekst>` – komunikaty informacyjne (np. start gry),
-* `WELCOME BLACK|WHITE` – przypisanie koloru klientowi,
-* `TURN BLACK|WHITE` – informacja, kto ma aktualnie ruch,
-* `ERROR <opis>` – błąd (np. nielegalny ruch),
-* `END <WINNER> <reason>` – koniec gry,
-* **opis planszy:**
+* `.` – puste pole,
+* `X` – kamień czarny,
+* `O` – kamień biały.
 
-  ```text
-  BOARD <size>
-  ROW <wiersz0>
-  ROW <wiersz1>
-  ...
-  ROW <wierszN-1>
-  END_BOARD
-  ```
-
-  gdzie:
-
-  * `<size>` – rozmiar planszy (np. 9),
-  * `<wiersz>` – ciąg znaków `'.'`, `'X'`, `'O'`:
-
-    * `.` – puste pole,
-    * `X` – kamień czarny,
-    * `O` – kamień biały.
-
-Klient **parsuje** (`BOARD / ROW / END_BOARD`) i rysuje planszę w czytelnej formie w metodzie `displayBoard`.
+Klient parsuje `BOARD / ROW / END_BOARD` i rysuje planszę w metodzie `displayBoard`.
 
 ---
 
 ## 7. Struktura pakietów
-
-Kod jest podzielony na pakiety zgodnie z odpowiedzialnościami:
 
 ```text
 pl.edu.go.board
@@ -236,107 +220,49 @@ pl.edu.go.model
     StoneGroup      // grupa kamieni (łańcuch)
 
 pl.edu.go.move
-    Move            // pojedynczy ruch (kolor + x,y)
-    MoveAdapter     // adapter z notacji użytkownika na współrzędne
-    MoveFactory     // fabryka tworząca obiekty Move
+    Move            // obiekt ruchu (kolor + x,y)
+    MoveAdapter     // adapter notacji użytkownika (B2/B 2) -> współrzędne
+    MoveFactory     // fabryka obiektów Move
 
 pl.edu.go.game
-    Game            // logika wysokiego poziomu: aktualny gracz, pass, resign
+    Game            // logika wyższego poziomu: tura, pass, resign, koniec gry
     GameObserver    // interfejs obserwatora gry (Observer)
-    GameResult      // prosty wynik gry (zwycięzca, powód)
+    GameResult      // wynik gry
     PlayerColor     // enum BLACK/WHITE + mapowanie na Board.BLACK/WHITE
 
 pl.edu.go.command
     GameCommand         // interfejs wzorca Command
-    PlaceStoneCommand   // komenda: postaw kamień
+    PlaceStoneCommand   // komenda: postaw kamień (bazuje na Move)
     PassCommand         // komenda: pas
     ResignCommand       // komenda: rezygnacja
-    TextCommandFactory  // fabryka parsująca tekst protokołu na GameCommand
+    TextCommandFactory  // fabryka: tekst protokołu -> GameCommand
 
 pl.edu.go.server
-    GameServer      // punkt startowy serwera, akceptuje dwóch klientów
-    GameSession     // jedna sesja gry: łączy Game, Command i klienta
-    ClientHandler   // obsługa pojedynczego klienta (wątek, socket)
+    GameServer      // start serwera, akceptuje dwóch klientów
+    GameSession     // sesja gry: łączy Game, Command i klienta
+    ClientHandler   // obsługa klienta (wątek, socket)
 
 pl.edu.go.client.cli
-    CliClient       // klient konsolowy: czyta komendy z klawiatury,
-                    // parsuje BOARD/ROW/END_BOARD i rysuje planszę
+    CliClient       // klient konsolowy: wejście z klawiatury + render planszy
 ```
 
 ---
 
 ## 8. Wzorce projektowe
 
-W projekcie wykorzystano kilka wzorców projektowych:
-
-### 8.1. Composite
-
-* **Gdzie:** `Stone` + `StoneGroup` w pakiecie `pl.edu.go.model`.
-* **Opis:** Kamień (`Stone`) jest liściem, `StoneGroup` jest kompozytem reprezentującym łańcuch kamieni.
-  `Board` operuje na grupach (`StoneGroup`) przy liczeniu oddechów i usuwaniu całych łańcuchów jednym wywołaniem.
-
-### 8.2. Adapter
-
-* **Gdzie:** `MoveAdapter` w pakiecie `pl.edu.go.move`.
-* **Opis:** Tłumaczy wejście użytkownika (np. notacja tekstowa) na współrzędne `(x, y)` używane przez `Board`.
-  Dzięki temu `Board` pozostaje czystą logiką bez znajomości formatu wejściowego.
-
-### 8.3. Factory Method
-
-* **Gdzie:**
-
-  * `BoardFactory` (tworzenie planszy o zadanym rozmiarze),
-  * `MoveFactory` (tworzenie obiektów `Move`),
-  * `TextCommandFactory` (tworzenie `GameCommand` na podstawie linii tekstu).
-* **Opis:** Konkretny sposób tworzenia obiektów jest ukryty w fabryce; reszta kodu używa tylko interfejsu (`Board`, `Move`, `GameCommand`), co ułatwia testy i późniejsze rozszerzenia.
-
-### 8.4. Command
-
-* **Gdzie:** pakiet `pl.edu.go.command`.
-* **Opis:** Każda akcja gracza (ruch, pas, rezygnacja) jest reprezentowana jako obiekt:
-
-  * `GameCommand` – interfejs,
-  * `PlaceStoneCommand`, `PassCommand`, `ResignCommand` – konkretne komendy.
-
-  Serwer:
-
-  ```java
-  GameCommand command = commandFactory.fromNetworkMessage(trimmed, from.getColor());
-  command.execute(game);
-  ```
-
-  Dzięki temu logika wykonania ruchu jest oddzielona od logiki sieci / parsowania.
-
-### 8.5. Observer
-
-* **Gdzie:** `Game`, `GameObserver`, `GameSession` w pakiecie `pl.edu.go.game` / `pl.edu.go.server`.
-* **Opis:** `Game` pełni rolę **subject** – ma listę obserwatorów (`GameObserver`) i powiadamia ich o:
-
-  * zmianie planszy (`onBoardChanged`),
-  * zmianie gracza (`onPlayerToMoveChanged`),
-  * zakończeniu gry (`onGameEnded`).
-
-  `GameSession` implementuje `GameObserver` i, po każdej zmianie, wysyła odpowiednie komunikaty do klientów (`BOARD`, `TURN`, `END`).
-
-### 8.6. MVC / MVP (planowane dla GUI)
-
-* W projekcie przewidziano dodatkowy moduł `client.gui` (GUI w osobnym oknie), który będzie korzystał z:
-
-  * **Modelu** (`Game` / `GameModel`),
-  * **View** (`BoardView`),
-  * **Controller/Presenter** (`GameController` – obsługa kliknięć, komunikacja z serwerem).
-
-  W Iteracji 1 skupiamy się na interfejsie konsolowym, ale architektura już przewiduje GUI.
+* **Composite**: `Stone` + `StoneGroup`
+* **Adapter**: `MoveAdapter`
+* **Factory Method**: `BoardFactory`, `MoveFactory`, `TextCommandFactory`
+* **Command**: `GameCommand` + `PlaceStoneCommand`/`PassCommand`/`ResignCommand`
+* **Observer**: `Game` (subject) + `GameSession` (observer)
 
 ---
 
 ## 9. Ograniczenia i uproszczenia
 
-* Serwer obsługuje jedną grę naraz i **dokładnie dwóch klientów**:
-
-  * po rozłączeniu klienta serwer należy uruchomić ponownie przed kolejną partią,
-* nie liczymy jeszcze punktów – gra kończy się głównie przez `RESIGN`,
-* brak zaawansowanych reguł (ko, superko etc.) – zgodnie z wymaganiami Iteracji 1.
+* Serwer obsługuje jedną grę naraz i dokładnie dwóch klientów.
+* Brak liczenia punktów – przy dwóch `PASS` kończymy grę z `WINNER = NONE`.
+* Brak reguł ko/superko (zgodnie z Iteracją 1).
 
 ---
 
@@ -344,26 +270,31 @@ W projekcie wykorzystano kilka wzorców projektowych:
 
 1. Skompiluj:
 
-   ```bash
-   mvn clean compile
-   ```
+```bash
+mvn clean compile
+```
 
 2. Serwer:
 
-   ```bash
-   java -cp target/classes pl.edu.go.server.GameServer
-   ```
+```bash
+java -cp target/classes pl.edu.go.server.GameServer
+```
 
-3. Klient 1 (BLACK):
+3. Klient 1 i 2:
 
-   ```bash
-   java -cp target/classes pl.edu.go.client.cli.CliClient
-   ```
+```bash
+java -cp target/classes pl.edu.go.client.cli.CliClient
+```
 
-4. Klient 2 (WHITE):
+4. Graj komendami: `MOVE B2` / `MOVE B 2`, `PASS`, `RESIGN`.
 
-   ```bash
-   java -cp target/classes pl.edu.go.client.cli.CliClient
-   ```
+```
 
-5. Graj komendami: `MOVE x y`, `PASS`, `RESIGN`.
+---
+
+## Co jeszcze warto dopiąć (jedno zdanie, żeby było 100% zgodne)
+W README dopisałem “PlaceStoneCommand bazuje na Move”, bo Twoja fabryka robi `new PlaceStoneCommand(move)`. To wymaga, żeby `PlaceStoneCommand` faktycznie miał konstruktor `PlaceStoneCommand(Move move)` i w `execute` delegował do `Game` (np. `game.playMove(move)` albo `game.playMove(player,x,y)` na podstawie move). Jeżeli w kodzie `PlaceStoneCommand` nadal ma stary konstruktor `(x,y,player)`, README i kod będą niespójne.
+
+Jeżeli wkleisz aktualny `PlaceStoneCommand.java`, sprawdzę wprost i powiem, czy README jest już w 100% zgodne, czy trzeba jedną drobną korektę w tekście albo w klasie.
+::contentReference[oaicite:0]{index=0}
+```
