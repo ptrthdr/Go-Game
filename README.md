@@ -289,12 +289,3 @@ java -cp target/classes pl.edu.go.client.cli.CliClient
 4. Graj komendami: `MOVE B2` / `MOVE B 2`, `PASS`, `RESIGN`.
 
 ```
-
----
-
-## Co jeszcze warto dopiąć (jedno zdanie, żeby było 100% zgodne)
-W README dopisałem “PlaceStoneCommand bazuje na Move”, bo Twoja fabryka robi `new PlaceStoneCommand(move)`. To wymaga, żeby `PlaceStoneCommand` faktycznie miał konstruktor `PlaceStoneCommand(Move move)` i w `execute` delegował do `Game` (np. `game.playMove(move)` albo `game.playMove(player,x,y)` na podstawie move). Jeżeli w kodzie `PlaceStoneCommand` nadal ma stary konstruktor `(x,y,player)`, README i kod będą niespójne.
-
-Jeżeli wkleisz aktualny `PlaceStoneCommand.java`, sprawdzę wprost i powiem, czy README jest już w 100% zgodne, czy trzeba jedną drobną korektę w tekście albo w klasie.
-::contentReference[oaicite:0]{index=0}
-```
