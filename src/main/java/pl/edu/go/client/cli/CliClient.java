@@ -213,7 +213,7 @@ public class CliClient {
             String row = rows.get(y);
 
             // numer wiersza z lewej
-            System.out.printf("%2d  ", y);
+            System.out.printf("%2d  ", y+1);
 
             for (int x = 0; x < size; x++) {
                 char c = (x < row.length()) ? row.charAt(x) : '.';
