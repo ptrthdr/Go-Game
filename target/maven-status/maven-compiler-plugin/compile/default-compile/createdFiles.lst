@@ -1,12 +1,12 @@
 pl/edu/go/move/Move.class
 pl/edu/go/server/GameServer.class
 pl/edu/go/server/ClientHandler.class
-pl/edu/go/game/Game.class
 pl/edu/go/move/MoveAdapter.class
+pl/edu/go/game/Game.class
 pl/edu/go/board/BoardFactory.class
+pl/edu/go/server/GameSession.class
 pl/edu/go/game/GameResult.class
 pl/edu/go/game/PlayerColor.class
-pl/edu/go/server/GameSession.class
 pl/edu/go/MainTest.class
 pl/edu/go/board/Board.class
 pl/edu/go/model/StoneGroup.class

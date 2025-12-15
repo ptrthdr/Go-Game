@@ -29,8 +29,6 @@ import java.util.*;
  * - grup i oddechów,
  * - bicia kamieni przeciwnika,
  * - zakazu samobójstwa.
- *
- * Nie zajmuje się UI ani komunikacją — to zadanie Osoby B.
  */
 
 public class Board {
@@ -150,7 +148,7 @@ public class Board {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        String[] symbols = { ".", "●", "○" };
+        String[] symbols = { ".", "○", "●" };
 
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
