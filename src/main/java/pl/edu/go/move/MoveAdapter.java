@@ -17,20 +17,20 @@ import java.util.Locale;
 
 public class MoveAdapter {
 
-    // Akceptuje: "B2", "b2", "B 2", "b   2"
+    // Akceptuje: "B2", "b2", "B 2", "b 2"
     public static int[] toInternal(String move) {
         if (move == null) {
-            throw new IllegalArgumentException("Move is null");
+            throw new IllegalArgumentException("Ruch nie może być wartością null");
         }
 
         String m = move.trim().toUpperCase(Locale.ROOT);
         if (m.isEmpty()) {
-            throw new IllegalArgumentException("Move is empty");
+            throw new IllegalArgumentException("Ruch nie może być pusty");
         }
 
         // litera + (opcjonalne spacje) + liczba
         if (!m.matches("^[A-Z]\\s*\\d+$")) {
-            throw new IllegalArgumentException("Invalid move. Use e.g. B2 or B 2 (letter + row number).");
+            throw new IllegalArgumentException("Niepoprawny ruch (wymagane zastosowanie to litera + numer wiersza)");
         }
 
         char column = m.charAt(0);
@@ -38,29 +38,10 @@ public class MoveAdapter {
 
         int row1Based = Integer.parseInt(m.substring(1).trim());
         if (row1Based < 1) {
-            throw new IllegalArgumentException("Row must be >= 1");
+            throw new IllegalArgumentException("Wiersz musi być >= 1");
         }
 
-        int y = row1Based - 1; // 1-based -> 0-based
-        return new int[] { x, y };
-    }
-
-    public static String toExternal(int x, int y) {
-        char col = (char) ('A' + x);
-        return "" + col + (y + 1); // 0-based -> 1-based
-    }
-}
-
-
-
-/*
-
-public class MoveAdapter {
-
-    public static int[] toInternal(String move) {
-        char column = Character.toUpperCase(move.charAt(0));
-        int x = column - 'A';
-        int y = Integer.parseInt(move.substring(1)) - 1;
+        int y = row1Based - 1;
         return new int[] { x, y };
     }
 
@@ -69,4 +50,21 @@ public class MoveAdapter {
         return "" + col + (y + 1);
     }
 }
-*/
+
+/*
+ * 
+ * public class MoveAdapter {
+ * 
+ * public static int[] toInternal(String move) {
+ * char column = Character.toUpperCase(move.charAt(0));
+ * int x = column - 'A';
+ * int y = Integer.parseInt(move.substring(1)) - 1;
+ * return new int[] { x, y };
+ * }
+ * 
+ * public static String toExternal(int x, int y) {
+ * char col = (char) ('A' + x);
+ * return "" + col + (y + 1);
+ * }
+ * }
+ */
