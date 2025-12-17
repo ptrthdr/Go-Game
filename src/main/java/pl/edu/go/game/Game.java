@@ -111,7 +111,7 @@ public class Game {
         // Board decyduje o legalności na planszy (zajęte, samobójstwo, bicie, bounds)
         boolean ok = board.playMove(player.toBoardColor(), x, y);
         if (!ok) {
-            throw new IllegalStateException("Illegal move at (" + x + ", " + y + ")");
+            throw new IllegalStateException("Illegal move at (" + (char) ('A' + x) + ", " + (y+1) + ")");
         }
 
         // Udany MOVE => reset passów, zmiana tury, powiadomienia

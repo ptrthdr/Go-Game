@@ -286,6 +286,7 @@ java -cp target/classes pl.edu.go.server.GameServer
 java -cp target/classes pl.edu.go.client.cli.CliClient
 ```
 
-4. Graj komendami: `MOVE B2` / `MOVE B 2`, `PASS`, `RESIGN`.
-
+4. Graj komendami: 
+```bash
+`MOVE B2` / `MOVE B 2`, `PASS`, `RESIGN`.
 ```

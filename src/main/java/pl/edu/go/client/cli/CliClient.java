@@ -190,9 +190,9 @@ public class CliClient {
      * Rysuje planszę w terminalu na podstawie listy wierszy ('.', 'X', 'O').
      *
      * Przykład:
-     *      0 1 2 3 4
-     *   0  . . X . .
-     *   1  . O . . .
+     *      A B C D E
+     *   1  . . X . .
+     *   2  . O . . .
      *   ...
      */
     private static void displayBoard(int size, List<String> rows) {
