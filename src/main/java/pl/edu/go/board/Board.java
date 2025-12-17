@@ -120,7 +120,7 @@ public class Board {
         board[x][y] = color;
 
         int opp = (color == BLACK ? WHITE : BLACK);
-        boolean captured = false;
+        boolean captured = false; // zmienna pozwalająca określić czy dany rych jest legalny
 
         for (int[] nb : neighbors(x, y)) {
             int nx = nb[0], ny = nb[1];
